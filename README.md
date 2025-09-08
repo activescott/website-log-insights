@@ -34,31 +34,52 @@ pnpm build
 
 ## Usage
 
-### CLI Tool
+### Quick Start
+
+The easiest way to analyze your nginx logs:
 
 ```bash
-# Run the CLI tool
-pnpm --filter cli dev
+# Clear database and analyze logs (recommended for fresh analysis)
+pnpm clear-logs && pnpm analyze -h your-domain.com -f path/to/your-access.log
 
-# Or after building
-pnpm --filter cli start
+# Or run commands separately
+pnpm clear-logs
+pnpm analyze -h your-domain.com -f path/to/your-access.log
+```
 
-# Analyze a specific log file
-pnpm --filter cli dev -- analyze --file /path/to/access.log
+### CLI Commands
 
-# Clear database before analyzing
-pnpm --filter cli dev -- analyze --file /path/to/access.log --clear
+```bash
+# Analyze logs for a specific hostname
+pnpm analyze -h scott.willeke.com -f 2025-09-07_access.log
 
-# Use custom database path
-pnpm --filter cli dev -- analyze --file /path/to/access.log --database ./custom.db
+# Clear the database
+pnpm clear-logs
 
-# Clear database
-pnpm --filter cli dev -- clear
+# Analyze with custom database location
+pnpm analyze -h example.com -f access.log -d custom-logs.db
+
+# Interactive mode (prompts for missing parameters)
+pnpm analyze
+```
+
+### Advanced Usage
+
+```bash
+# Clear database before analyzing (fresh start)
+pnpm analyze -h example.com -f access.log --clear
+
+# Analyze multiple hosts by running separate commands
+pnpm analyze -h site1.com -f site1-access.log
+pnpm analyze -h site2.com -f site2-access.log
+
+# View help
+pnpm analyze --help
 ```
 
 ### Interactive Mode
 
-When you run the CLI without specifying a file path, it will prompt you to enter the path to your nginx access log file.
+When you run the CLI without specifying required parameters (file path or hostname), it will prompt you to enter them interactively.
 
 ### Library Usage
 
@@ -66,11 +87,12 @@ When you run the CLI without specifying a file path, it will prompt you to enter
 import { LogAnalyzer } from '@website-log-insights/log-analyzer';
 
 const analyzer = new LogAnalyzer('./logs.db');
-await analyzer.loadLogFile('/path/to/access.log');
+await analyzer.loadLogFile('/path/to/access.log', 'your-domain.com');
 const results = await analyzer.analyze();
 
 console.log('Total requests:', results.summary.totalRequests);
 console.log('Top pages:', results.pages.slice(0, 5));
+console.log('Tracked hosts:', analyzer.getAllHosts());
 
 analyzer.close();
 ```

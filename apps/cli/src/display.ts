@@ -215,8 +215,8 @@ function displayErrors(errors: AnalysisResults['errors']): void {
   console.log(chalk.bold.yellow('❌ TOP 404s AND ERRORS'));
   console.log('═'.repeat(80));
   
-  // Calculate optimal URL column width
-  const maxErrorUrlLength = Math.min(MAX_PATH_COLUMN_WIDTH, Math.max(45, 
+  // Calculate optimal URL column width (use 80 as minimum for errors to avoid truncation)
+  const maxErrorUrlLength = Math.min(MAX_PATH_COLUMN_WIDTH, Math.max(80, 
     errors.reduce((max, error) => Math.max(max, error.url.length), 0)
   ));
   
