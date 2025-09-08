@@ -1,0 +1,32 @@
+{
+  "name": "website-log-insights-cli",
+  "version": "1.0.0",
+  "description": "CLI tool for analyzing nginx access logs",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "log-insights": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "lint": "echo 'No linting configured yet'",
+    "test": "echo 'No tests configured yet'"
+  },
+  "dependencies": {
+    "@website-log-insights/log-analyzer": "workspace:*",
+    "cli-table3": "^0.6.3",
+    "commander": "^12.0.0",
+    "inquirer": "^9.2.15",
+    "chalk": "^5.3.0",
+    "bytes": "^3.1.2"
+  },
+  "devDependencies": {
+    "@types/bytes": "^3.1.4",
+    "@types/inquirer": "^9.0.7",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
+  }
+}
