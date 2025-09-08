@@ -18,31 +18,52 @@ program
   .command('analyze')
   .description('Analyze a log file and display insights')
   .option('-f, --file <path>', 'Path to the log file')
+  .option('-h, --host <hostname>', 'Hostname for the log file (e.g., example.com)')
   .option('-d, --database <path>', 'Path to the SQLite database (default: ./logs.db)')
   .option('--clear', 'Clear existing data before importing')
   .action(async (options) => {
     try {
       let logFilePath = options.file;
+      let hostname = options.host;
       
-      // Prompt for file path if not provided
+      // Prompt for missing parameters
+      const prompts = [];
+      
       if (!logFilePath) {
-        const answers = await inquirer.prompt([
-          {
-            type: 'input',
-            name: 'logFilePath',
-            message: 'Enter the path to your nginx access log file:',
-            validate: (input: string) => {
-              if (!input.trim()) {
-                return 'Please enter a file path';
-              }
-              if (!existsSync(input.trim())) {
-                return 'File does not exist';
-              }
-              return true;
+        prompts.push({
+          type: 'input',
+          name: 'logFilePath',
+          message: 'Enter the path to your nginx access log file:',
+          validate: (input: string) => {
+            if (!input.trim()) {
+              return 'Please enter a file path';
             }
+            if (!existsSync(input.trim())) {
+              return 'File does not exist';
+            }
+            return true;
           }
-        ]);
-        logFilePath = answers.logFilePath.trim();
+        });
+      }
+      
+      if (!hostname) {
+        prompts.push({
+          type: 'input',
+          name: 'hostname',
+          message: 'Enter the hostname for this log file (e.g., example.com):',
+          validate: (input: string) => {
+            if (!input.trim()) {
+              return 'Please enter a hostname';
+            }
+            return true;
+          }
+        });
+      }
+      
+      if (prompts.length > 0) {
+        const answers = await inquirer.prompt(prompts);
+        logFilePath = logFilePath || answers.logFilePath?.trim();
+        hostname = hostname || answers.hostname?.trim();
       }
 
       // Validate file exists
@@ -53,6 +74,7 @@ program
 
       console.log(chalk.blue('🚀 Starting log analysis...'));
       console.log(chalk.gray(`Log file: ${logFilePath}`));
+      console.log(chalk.gray(`Hostname: ${hostname}`));
       
       if (options.database) {
         console.log(chalk.gray(`Database: ${options.database}`));
@@ -66,7 +88,7 @@ program
       }
 
       // Load and analyze the log file
-      await analyzer.loadLogFile(logFilePath);
+      await analyzer.loadLogFile(logFilePath, hostname);
       
       console.log(chalk.blue('📊 Running analysis...'));
       const results = await analyzer.analyze();

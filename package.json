@@ -13,7 +13,9 @@
     "dev": "pnpm -r dev",
     "clean": "pnpm -r clean",
     "lint": "pnpm -r lint",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "analyze": "pnpm build && node apps/cli/dist/index.js analyze",
+    "clear-logs": "pnpm build && node apps/cli/dist/index.js clear"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",

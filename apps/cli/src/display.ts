@@ -3,6 +3,8 @@ import chalk from 'chalk';
 import bytes from 'bytes';
 import { AnalysisResults } from '@website-log-insights/log-analyzer';
 
+const MAX_PATH_COLUMN_WIDTH = 120;
+
 export function displayResults(results: AnalysisResults): void {
   console.log('\n' + chalk.bold.blue('📊 WEBSITE LOG ANALYSIS RESULTS') + '\n');
   
@@ -104,6 +106,11 @@ function displayPopularPages(pages: AnalysisResults['pages']): void {
   console.log(chalk.bold.yellow('📄 MOST POPULAR PAGES'));
   console.log('═'.repeat(80));
   
+  // Calculate optimal URL column width
+  const maxUrlLength = Math.min(MAX_PATH_COLUMN_WIDTH, Math.max(40, 
+    pages.slice(0, 20).reduce((max, page) => Math.max(max, page.url.length), 0)
+  ));
+  
   const table = new Table({
     head: [
       chalk.cyan('URL'),
@@ -112,13 +119,13 @@ function displayPopularPages(pages: AnalysisResults['pages']): void {
       chalk.cyan('Bot Requests'),
       chalk.cyan('Human Requests')
     ],
-    colWidths: [40, 12, 12, 12, 12],
+    colWidths: [maxUrlLength, 12, 12, 12, 12],
     wordWrap: true
   });
   
   pages.slice(0, 20).forEach(page => {
-    const urlDisplay = page.url.length > 37 ? 
-      page.url.substring(0, 34) + '...' : page.url;
+    const urlDisplay = page.url.length > maxUrlLength - 3 ? 
+      page.url.substring(0, maxUrlLength - 3) + '...' : page.url;
     
     table.push([
       urlDisplay,
@@ -133,6 +140,10 @@ function displayPopularPages(pages: AnalysisResults['pages']): void {
   
   // Show time breakdown for top 5 pages
   console.log(chalk.bold.cyan('\n⏰ Time Breakdown (Top 5 Pages):'));
+  const timeMaxUrlLength = Math.min(MAX_PATH_COLUMN_WIDTH, Math.max(40, 
+    pages.slice(0, 5).reduce((max, page) => Math.max(max, page.url.length), 0)
+  ));
+  
   const timeTable = new Table({
     head: [
       chalk.cyan('URL'),
@@ -140,13 +151,13 @@ function displayPopularPages(pages: AnalysisResults['pages']): void {
       chalk.cyan('7d'),
       chalk.cyan('30d')
     ],
-    colWidths: [40, 10, 10, 10],
+    colWidths: [timeMaxUrlLength, 10, 10, 10],
     wordWrap: true
   });
   
   pages.slice(0, 5).forEach(page => {
-    const urlDisplay = page.url.length > 37 ? 
-      page.url.substring(0, 34) + '...' : page.url;
+    const urlDisplay = page.url.length > timeMaxUrlLength - 3 ? 
+      page.url.substring(0, timeMaxUrlLength - 3) + '...' : page.url;
     
     timeTable.push([
       urlDisplay,
@@ -166,6 +177,11 @@ function displayReferrers(referrers: AnalysisResults['referrers']): void {
   console.log(chalk.bold.yellow('🔗 TOP REFERRERS'));
   console.log('═'.repeat(80));
   
+  // Calculate optimal referrer column width
+  const maxReferrerLength = Math.min(MAX_PATH_COLUMN_WIDTH, Math.max(50, 
+    referrers.reduce((max, ref) => Math.max(max, ref.referrer.length), 0)
+  ));
+  
   const table = new Table({
     head: [
       chalk.cyan('Referrer'),
@@ -173,13 +189,13 @@ function displayReferrers(referrers: AnalysisResults['referrers']): void {
       chalk.cyan('7d'),
       chalk.cyan('30d')
     ],
-    colWidths: [50, 10, 10, 10],
+    colWidths: [maxReferrerLength, 10, 10, 10],
     wordWrap: true
   });
   
   referrers.slice(0, 15).forEach(ref => {
-    const referrerDisplay = ref.referrer.length > 47 ? 
-      ref.referrer.substring(0, 44) + '...' : ref.referrer;
+    const referrerDisplay = ref.referrer.length > maxReferrerLength - 3 ? 
+      ref.referrer.substring(0, maxReferrerLength - 3) + '...' : ref.referrer;
     
     table.push([
       referrerDisplay,
@@ -199,6 +215,11 @@ function displayErrors(errors: AnalysisResults['errors']): void {
   console.log(chalk.bold.yellow('❌ TOP 404s AND ERRORS'));
   console.log('═'.repeat(80));
   
+  // Calculate optimal URL column width
+  const maxErrorUrlLength = Math.min(MAX_PATH_COLUMN_WIDTH, Math.max(45, 
+    errors.reduce((max, error) => Math.max(max, error.url.length), 0)
+  ));
+  
   const table = new Table({
     head: [
       chalk.cyan('URL'),
@@ -207,13 +228,13 @@ function displayErrors(errors: AnalysisResults['errors']): void {
       chalk.cyan('7d'),
       chalk.cyan('30d')
     ],
-    colWidths: [45, 8, 8, 8, 8],
+    colWidths: [maxErrorUrlLength, 8, 8, 8, 8],
     wordWrap: true
   });
   
   errors.slice(0, 20).forEach(error => {
-    const urlDisplay = error.url.length > 42 ? 
-      error.url.substring(0, 39) + '...' : error.url;
+    const urlDisplay = error.url.length > maxErrorUrlLength - 3 ? 
+      error.url.substring(0, maxErrorUrlLength - 3) + '...' : error.url;
     
     const statusColor = error.statusCode >= 500 ? 'red' : 
                        error.statusCode >= 400 ? 'yellow' : 'cyan';
