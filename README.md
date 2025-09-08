@@ -1,6 +1,6 @@
 # Website Log Insights
 
-A powerful TypeScript tool for analyzing nginx access logs and generating comprehensive insights about your website traffic.
+An AI-generated hack for analyzing nginx access logs and generating comprehensive insights about website traffic from simple web log files such as those from nginx.
 
 ## Features
 
