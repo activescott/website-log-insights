@@ -52,6 +52,9 @@ pnpm run analyze -f ./logs/scott.willeke.com/access.log -h scott.willeke.com
 
 ```bash
 
+# View help
+pnpm analyze --help
+
 # Clear database and analyze logs (recommended for fresh analysis)
 pnpm clear-logs && pnpm analyze -h your-domain.com -f path/to/your-access.log
 
@@ -72,39 +75,9 @@ pnpm analyze -h example.com -f access.log -d custom-logs.db
 pnpm analyze
 ```
 
-### Advanced Usage
-
-```bash
-# Clear database before analyzing (fresh start)
-pnpm analyze -h example.com -f access.log --clear
-
-# Analyze multiple hosts by running separate commands
-pnpm analyze -h site1.com -f site1-access.log
-pnpm analyze -h site2.com -f site2-access.log
-
-# View help
-pnpm analyze --help
-```
-
-### Interactive Mode
+#### Interactive Mode
 
 When you run the CLI without specifying required parameters (file path or hostname), it will prompt you to enter them interactively.
-
-### Library Usage
-
-```typescript
-import { LogAnalyzer } from '@website-log-insights/log-analyzer';
-
-const analyzer = new LogAnalyzer('./logs.db');
-await analyzer.loadLogFile('/path/to/access.log', 'your-domain.com');
-const results = await analyzer.analyze();
-
-console.log('Total requests:', results.summary.totalRequests);
-console.log('Top pages:', results.pages.slice(0, 5));
-console.log('Tracked hosts:', analyzer.getAllHosts());
-
-analyzer.close();
-```
 
 ## Supported Log Format
 
@@ -117,6 +90,32 @@ $remote_addr - $remote_user [$time_local] "$request" $status $bytes_sent "$http_
 Example:
 ```
 172.16.6.142 - - [06/Sep/2025:11:01:23 -0700] "GET /js/script.js HTTP/1.1" 200 1650 "https://example.com/" "Mozilla/5.0..." "205.169.39.128"
+```
+
+To set this format up in nginx you can use the following in nginx.conf:
+
+```
+...
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    # Logging format
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                   '$status $body_bytes_sent "$http_referer" '
+                   '"$http_user_agent" "$http_x_forwarded_for"';
+
+    # Map to disable logging for kube-probe requests
+    # these look like "kube-probe/1.25"
+    map $http_user_agent $loggable {
+        ~*kube-probe 0;
+        default 1;
+    }
+
+    access_log /var/log/nginx/access.log main if=$loggable;
+    ...
+}
 ```
 
 ## Analysis Reports
@@ -161,12 +160,7 @@ The tool automatically detects bots based on user agent patterns, including:
 
 ## Database
 
-The tool uses SQLite for efficient local storage and querying:
-
-- Automatic indexing for fast queries
-- Persistent storage between runs
-- Incremental data loading
-- Easy backup and sharing
+The tool uses SQLite for efficient local storage and querying.
 
 ## Development
 

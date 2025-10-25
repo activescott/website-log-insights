@@ -1,7 +1,6 @@
 # Claude Code Project Notes - Website Log Insights
 
 ## Project Structure
-- **Type**: Monorepo workspace using pnpm
 - **Package Manager**: Use `pnpm` (not npm) for all operations
 - **Workspace Structure**:
   - `packages/log-analyzer`: Core log analysis library
