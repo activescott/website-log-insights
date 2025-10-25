@@ -4,3 +4,4 @@ dist/
 /apps/cli/logs.db
 tsconfig.tsbuildinfo
 /logs.db
+/logs/

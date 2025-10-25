@@ -65,6 +65,8 @@ function displaySummary(summary: AnalysisResults['summary']): void {
 
 function displayUserAgents(userAgents: AnalysisResults['userAgents']): void {
   if (userAgents.length === 0) return;
+  const USER_AGENT_COLUMN_WIDTH = 100;
+  const USER_AGENT_MAX_CHAR_COUNT = USER_AGENT_COLUMN_WIDTH * 2;
   
   console.log(chalk.bold.yellow('🤖 TOP USER AGENTS'));
   console.log('═'.repeat(80));
@@ -77,13 +79,13 @@ function displayUserAgents(userAgents: AnalysisResults['userAgents']): void {
       chalk.cyan('30d'),
       chalk.cyan('Type')
     ],
-    colWidths: [50, 8, 8, 8, 8],
+    colWidths: [USER_AGENT_COLUMN_WIDTH, 8, 8, 8, 8],
     wordWrap: true
   });
   
   userAgents.slice(0, 20).forEach(ua => {
-    const userAgentDisplay = ua.userAgent.length > 47 ? 
-      ua.userAgent.substring(0, 44) + '...' : ua.userAgent;
+    const userAgentDisplay = ua.userAgent.length > USER_AGENT_MAX_CHAR_COUNT ? 
+      ua.userAgent.substring(0, USER_AGENT_MAX_CHAR_COUNT) + '...' : ua.userAgent;
     
     const typeDisplay = ua.isBot ? chalk.red('Bot') : chalk.green('User');
     

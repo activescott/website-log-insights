@@ -171,21 +171,21 @@ export class LogDatabase {
     const thirtyDaysAgo = subDays(now, 30).getTime();
 
     const stmt = this.db.prepare(`
-      SELECT 
+      SELECT
         url,
         SUM(CASE WHEN timestamp >= ? THEN 1 ELSE 0 END) as requests_1d,
         SUM(CASE WHEN timestamp >= ? THEN 1 ELSE 0 END) as requests_7d,
         SUM(CASE WHEN timestamp >= ? THEN 1 ELSE 0 END) as requests_30d,
-        COUNT(DISTINCT CASE WHEN timestamp >= ? THEN ip END) as unique_ips_1d,
-        COUNT(DISTINCT CASE WHEN timestamp >= ? THEN ip END) as unique_ips_7d,
-        COUNT(DISTINCT CASE WHEN timestamp >= ? THEN ip END) as unique_ips_30d,
+        COUNT(DISTINCT CASE WHEN timestamp >= ? THEN COALESCE(forwarded_for, ip) END) as unique_ips_1d,
+        COUNT(DISTINCT CASE WHEN timestamp >= ? THEN COALESCE(forwarded_for, ip) END) as unique_ips_7d,
+        COUNT(DISTINCT CASE WHEN timestamp >= ? THEN COALESCE(forwarded_for, ip) END) as unique_ips_30d,
         SUM(CASE WHEN timestamp >= ? AND is_bot = 1 THEN 1 ELSE 0 END) as bot_requests_1d,
         SUM(CASE WHEN timestamp >= ? AND is_bot = 1 THEN 1 ELSE 0 END) as bot_requests_7d,
         SUM(CASE WHEN timestamp >= ? AND is_bot = 1 THEN 1 ELSE 0 END) as bot_requests_30d,
         SUM(CASE WHEN timestamp >= ? AND is_bot = 0 THEN 1 ELSE 0 END) as non_bot_requests_1d,
         SUM(CASE WHEN timestamp >= ? AND is_bot = 0 THEN 1 ELSE 0 END) as non_bot_requests_7d,
         SUM(CASE WHEN timestamp >= ? AND is_bot = 0 THEN 1 ELSE 0 END) as non_bot_requests_30d
-      FROM log_entries 
+      FROM log_entries
       GROUP BY url
       ORDER BY requests_30d DESC
       LIMIT ?
@@ -306,20 +306,20 @@ export class LogDatabase {
     const thirtyDaysAgo = subDays(now, 30).getTime();
 
     const stmt = this.db.prepare(`
-      SELECT 
-        ip,
+      SELECT
+        COALESCE(forwarded_for, ip) as ip,
         SUM(CASE WHEN timestamp >= ? THEN 1 ELSE 0 END) as requests_1d,
         SUM(CASE WHEN timestamp >= ? THEN 1 ELSE 0 END) as requests_7d,
         SUM(CASE WHEN timestamp >= ? THEN 1 ELSE 0 END) as requests_30d,
         MAX(is_bot) as is_bot
-      FROM log_entries 
-      GROUP BY ip
+      FROM log_entries
+      GROUP BY COALESCE(forwarded_for, ip)
       ORDER BY requests_30d DESC
       LIMIT ?
     `);
 
     const results = stmt.all(oneDayAgo, sevenDaysAgo, thirtyDaysAgo, limit) as any[];
-    
+
     return results.map(row => ({
       ip: row.ip,
       requests1d: row.requests_1d || 0,

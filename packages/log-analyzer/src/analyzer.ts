@@ -3,6 +3,8 @@ import { LogDatabase } from './database.js';
 import { parseLogFile } from './parser.js';
 import { UserAgentStats, PageStats, ReferrerStats, ErrorStats, BandwidthStats, TopIPStats } from './types.js';
 
+const numberFormatDefault = new Intl.NumberFormat()
+
 export interface AnalysisResults {
   userAgents: UserAgentStats[];
   pages: PageStats[];
@@ -45,12 +47,12 @@ export class LogAnalyzer {
       throw new Error('No valid log entries found in the file');
     }
 
-    console.log(`Parsed ${entries.length} log entries`);
+    console.log(`Parsed ${numberFormatDefault.format(entries.length)} log entries`);
     console.log('Importing into database...');
     
     this.db.insertLogEntries(entries, hostname);
     
-    console.log(`Successfully imported ${entries.length} log entries for host: ${hostname}`);
+    console.log(`Successfully imported ${numberFormatDefault.format(entries.length)} log entries for host: ${hostname}`);
   }
 
   async analyze(options: {

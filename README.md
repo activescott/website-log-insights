@@ -36,20 +36,29 @@ pnpm build
 
 ### Quick Start
 
-The easiest way to analyze your nginx logs:
+Here is my typical workflow for analyzing my logs:
 
 ```bash
+# Copy logs to data/<hostname>
+mkdir -p ./logs/scott.willeke.com
+rsync -avi scott@nas.activescott.com:/mnt/thedatapool/app-data/scott-willeke-com/logs/ ./logs/scott.willeke.com/
+
+# Run analyzer on the logs:
+pnpm run analyze -f ./logs/scott.willeke.com/access.log -h scott.willeke.com
+```
+
+
+### CLI Commands
+
+```bash
+
 # Clear database and analyze logs (recommended for fresh analysis)
 pnpm clear-logs && pnpm analyze -h your-domain.com -f path/to/your-access.log
 
 # Or run commands separately
 pnpm clear-logs
 pnpm analyze -h your-domain.com -f path/to/your-access.log
-```
 
-### CLI Commands
-
-```bash
 # Analyze logs for a specific hostname
 pnpm analyze -h scott.willeke.com -f 2025-09-07_access.log
 
