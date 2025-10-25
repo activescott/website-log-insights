@@ -92,10 +92,10 @@ program
       
       console.log(chalk.blue('📊 Running analysis...'));
       const results = await analyzer.analyze();
-      
+
       // Display results
-      displayResults(results);
-      
+      await displayResults(results);
+
       analyzer.close();
       console.log(chalk.green('✅ Analysis complete!'));
       

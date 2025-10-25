@@ -60,6 +60,9 @@ importers:
       date-fns:
         specifier: ^3.3.1
         version: 3.6.0
+      whoiser:
+        specifier: 2.0.0-beta.9
+        version: 2.0.0-beta.9
     devDependencies:
       '@types/better-sqlite3':
         specifier: ^7.6.8
@@ -1458,6 +1461,11 @@ packages:
       once: 1.4.0
     dev: false
 
+  /punycode-esm@1.0.15:
+    resolution: {integrity: sha512-pR7pzaunGU4g3v3vMIXD9WnrGUiEBs2ezcVYr9piTC/HVem9F+MJ+JNdSeYD9pK7EumLMUMO9F3Gsa3RS+o7pA==}
+    engines: {node: '>=20'}
+    dev: false
+
   /rc@1.2.8:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
     hasBin: true
@@ -1863,6 +1871,12 @@ packages:
     dependencies:
       isexe: 2.0.0
     dev: true
+
+  /whoiser@2.0.0-beta.9:
+    resolution: {integrity: sha512-RCRf37szSXLGGJM7g86oMQp9GiqJ1Ty+TwfUCX/Ld4SuMwAWn2WAbY+S4dwVyPHK47PZwfMX/SPb8/XraGZ0mg==}
+    dependencies:
+      punycode-esm: 1.0.15
+    dev: false
 
   /why-is-node-running@2.3.0:
     resolution: {integrity: sha512-hUrmaWBdVDcxvYqnyh09zunKzROWjbZTiNy8dBEjkS7ehEDQibXJ7XvlmtbwuTclUiIyN+CyXQD4Vmko8fNm8w==}

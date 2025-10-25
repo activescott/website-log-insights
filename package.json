@@ -13,6 +13,7 @@
     "dev": "pnpm -r dev",
     "clean": "pnpm -r clean",
     "lint": "pnpm -r lint",
+    "typecheck": "pnpm build && pnpm --recursive typecheck",
     "test": "pnpm -r test",
     "analyze": "pnpm build && node apps/cli/dist/index.js analyze",
     "clear-logs": "pnpm build && node apps/cli/dist/index.js clear"

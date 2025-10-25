@@ -1,31 +1,31 @@
 import Table from 'cli-table3';
 import chalk from 'chalk';
 import bytes from 'bytes';
-import { AnalysisResults } from '@website-log-insights/log-analyzer';
+import { AnalysisResults, getOrganizationsForIPs } from '@website-log-insights/log-analyzer';
 
 const MAX_PATH_COLUMN_WIDTH = 120;
 
-export function displayResults(results: AnalysisResults): void {
+export async function displayResults(results: AnalysisResults): Promise<void> {
   console.log('\n' + chalk.bold.blue('📊 WEBSITE LOG ANALYSIS RESULTS') + '\n');
-  
+
   // Summary Section
   displaySummary(results.summary);
-  
+
   // User Agents Section
   displayUserAgents(results.userAgents);
-  
-  // Popular Pages Section  
+
+  // Popular Pages Section
   displayPopularPages(results.pages);
-  
+
   // Top Referrers Section
   displayReferrers(results.referrers);
-  
+
   // Top 404s Section
   displayErrors(results.errors);
-  
+
   // Top IPs Section
-  displayTopIPs(results.topIPs);
-  
+  await displayTopIPs(results.topIPs);
+
   // Bandwidth Analysis Section
   displayBandwidth(results.bandwidth);
 }
@@ -254,12 +254,17 @@ function displayErrors(errors: AnalysisResults['errors']): void {
   console.log('\n');
 }
 
-function displayTopIPs(topIPs: AnalysisResults['topIPs']): void {
+async function displayTopIPs(topIPs: AnalysisResults['topIPs']): Promise<void> {
   if (topIPs.length === 0) return;
-  
+
   console.log(chalk.bold.yellow('🌐 TOP IP ADDRESSES'));
   console.log('═'.repeat(60));
-  
+
+  // Fetch WHOIS data for all IPs
+  const ips = topIPs.slice(0, 15).map(ip => ip.ip);
+  console.log(chalk.gray('Looking up WHOIS data for IP addresses...'));
+  const organizations = await getOrganizationsForIPs(ips);
+
   const table = new Table({
     head: [
       chalk.cyan('IP Address'),
@@ -268,21 +273,24 @@ function displayTopIPs(topIPs: AnalysisResults['topIPs']): void {
       chalk.cyan('30d'),
       chalk.cyan('Type')
     ],
-    colWidths: [18, 8, 8, 8, 8]
+    colWidths: [50, 8, 8, 8, 8],
+    wordWrap: true
   });
-  
+
   topIPs.slice(0, 15).forEach(ip => {
     const typeDisplay = ip.isBot ? chalk.red('Bot') : chalk.green('User');
-    
+    const org = organizations.get(ip.ip);
+    const ipDisplay = org ? `${ip.ip} (${org})` : ip.ip;
+
     table.push([
-      ip.ip,
+      ipDisplay,
       ip.requests1d.toLocaleString(),
       ip.requests7d.toLocaleString(),
       ip.requests30d.toLocaleString(),
       typeDisplay
     ]);
   });
-  
+
   console.log(table.toString());
   console.log('\n');
 }
